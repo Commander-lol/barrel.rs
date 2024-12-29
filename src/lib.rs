@@ -210,3 +210,17 @@ pub enum PrimaryKeyChange {
     /// Adds a primary key to the table
     AddPrimaryKey(Vec<String>),
 }
+
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub enum UnsupportedReverseChange {
+    /// Temporary value, representing a ChangeTable command
+    #[doc(hidden)]
+    TempDontRelyOnThis_ChangeTable,
+    /// Can't reverse a drop table command as there isn't sufficient metadata to restore the table
+    DropTable(String),
+    /// Can't reverse a drop table command as there isn't sufficient metadata to restore the table
+    DropTableIfExists(String),
+    /// Can't automatically reverse a custom string, as there is no metadata defining the change
+    CustomLine(String),
+}

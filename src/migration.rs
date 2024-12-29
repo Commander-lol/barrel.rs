@@ -14,7 +14,7 @@
 use std::error::Error;
 use std::fmt::{Display, Formatter};
 use crate::table::{Table, TableMeta};
-use crate::DatabaseChange;
+use crate::{DatabaseChange, UnsupportedReverseChange};
 
 use crate::backend::{SqlGenerator, SqlVariant};
 use crate::connectors::SqlRunner;
@@ -22,6 +22,7 @@ use crate::connectors::SqlRunner;
 use std::rc::Rc;
 
 /// Represents a schema migration on a database
+#[derive(Clone)]
 pub struct Migration {
     #[doc(hidden)]
     pub schema: Option<String>,
@@ -30,10 +31,31 @@ pub struct Migration {
 }
 
 #[derive(Debug, Clone)]
-pub struct MigrationRevertError(String);
+pub struct MigrationRevertError {
+    kind: UnsupportedReverseChange
+}
+impl MigrationRevertError {
+    pub fn new(kind: UnsupportedReverseChange) -> Self {
+        MigrationRevertError { kind }
+    }
+    pub fn kind(&self) -> &UnsupportedReverseChange {
+        &self.kind
+    }
+}
+impl From<UnsupportedReverseChange> for MigrationRevertError {
+    fn from(kind: UnsupportedReverseChange) -> Self {
+        MigrationRevertError::new(kind)
+    }
+}
 impl Display for MigrationRevertError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "Failed to revert operation: {}", self.0)
+        write!(f, "Failed to revert operation: ")?;
+        match &self.kind {
+            UnsupportedReverseChange::DropTable(table_name) => writeln!(f, "Dropping table: {}", table_name),
+            UnsupportedReverseChange::DropTableIfExists(table_name) => writeln!(f, "Dropping table if exists: {}", table_name),
+            UnsupportedReverseChange::CustomLine(_) => writeln!(f, "Execute custom SQL"),
+            UnsupportedReverseChange::TempDontRelyOnThis_ChangeTable => writeln!(f, "Change Table"),
+        }
     }
 }
 impl Error for MigrationRevertError {}
@@ -226,14 +248,14 @@ impl Migration {
                 | CreateTableIfNotExists(table, _cb) => {
                     sql.push_str(&T::drop_table_if_exists(&table.meta.name, schema));
                 }
-                DropTable(name) => return Err(MigrationRevertError(format!("DropTable `{}`", name))),
-                DropTableIfExists(name) => return Err(MigrationRevertError(format!("DropTableIfExists `{}`", name))),
+                DropTable(name) => return Err(UnsupportedReverseChange::DropTable(name.clone()).into()),
+                DropTableIfExists(name) => return Err(UnsupportedReverseChange::DropTableIfExists(name.clone()).into()),
                 RenameTable(old, new) => {
                     sql.push_str(&T::rename_table(new, old, schema))
                 }
                 // TODO: Implement revert for table changes
-                ChangeTable(table, _cb) => return Err(MigrationRevertError(format!("ChangeTable `{}`", table.meta.name))),
-                CustomLine(_line) => return Err(MigrationRevertError(String::from("Custom SQL"))),
+                ChangeTable(_table, _cb) => return Err(UnsupportedReverseChange::TempDontRelyOnThis_ChangeTable.into()),
+                CustomLine(line) => return Err(UnsupportedReverseChange::CustomLine(line.clone()).into()),
             }
 
             sql.push_str(";");
