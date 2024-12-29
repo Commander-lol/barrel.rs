@@ -11,6 +11,8 @@
 //! You can also use `Migration::exec` with your SQL connection for convenience
 //! if you're a library developer.
 
+use std::error::Error;
+use std::fmt::{Display, Formatter};
 use crate::table::{Table, TableMeta};
 use crate::DatabaseChange;
 
@@ -26,6 +28,15 @@ pub struct Migration {
     #[doc(hidden)]
     pub changes: Vec<DatabaseChange>,
 }
+
+#[derive(Debug, Clone)]
+pub struct MigrationRevertError(String);
+impl Display for MigrationRevertError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "Failed to revert operation: {}", self.0)
+    }
+}
+impl Error for MigrationRevertError {}
 
 impl Migration {
     pub fn new() -> Migration {
@@ -201,10 +212,34 @@ impl Migration {
 
     /// Automatically infer the `down` step of this migration
     ///
-    /// Will thrown an error if behaviour is ambiguous or not
+    /// Will throw an error if behaviour is ambiguous or not
     /// possible to infer (e.g. revert a `drop_table`)
-    pub fn revert<T: SqlGenerator>(&self) -> String {
-        unimplemented!()
+    pub fn revert<T: SqlGenerator>(&self) -> Result<String, MigrationRevertError> {
+        use DatabaseChange::*;
+
+        let mut sql = String::new();
+        let schema = self.schema.as_ref().map(|s| s.as_str());
+
+        for change in self.changes.iter() {
+            match change {
+                CreateTable(table, _cb)
+                | CreateTableIfNotExists(table, _cb) => {
+                    sql.push_str(&T::drop_table_if_exists(&table.meta.name, schema));
+                }
+                DropTable(name) => return Err(MigrationRevertError(format!("DropTable `{}`", name))),
+                DropTableIfExists(name) => return Err(MigrationRevertError(format!("DropTableIfExists `{}`", name))),
+                RenameTable(old, new) => {
+                    sql.push_str(&T::rename_table(new, old, schema))
+                }
+                // TODO: Implement revert for table changes
+                ChangeTable(table, _cb) => return Err(MigrationRevertError(format!("ChangeTable `{}`", table.meta.name))),
+                CustomLine(_line) => return Err(MigrationRevertError(String::from("Custom SQL"))),
+            }
+
+            sql.push_str(";");
+        }
+
+        Ok(sql)
     }
 
     /// Pass a reference to a migration toolkit runner which will
