@@ -1,8 +1,8 @@
 //! Some unit tests that create create tables
 #![allow(unused_imports)]
 
-use crate::backend::{MsSql, SqlGenerator};
-use crate::{types, Migration, Table};
+use barrel::backend::{MsSql, SqlGenerator};
+use barrel::{types, Migration, Table};
 
 #[test]
 fn create_table_if_not_exists_doesnt_hit_unreachable() {

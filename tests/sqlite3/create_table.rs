@@ -1,8 +1,8 @@
 //! Some unit tests that create create tables
 #![allow(unused_imports)]
 
-use crate::backend::{SqlGenerator, Sqlite};
-use crate::{types, Migration, Table};
+use barrel::backend::{SqlGenerator, Sqlite};
+use barrel::{types, Migration, Table};
 
 #[test]
 fn create_multiple_tables() {

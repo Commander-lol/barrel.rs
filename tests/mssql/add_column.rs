@@ -1,8 +1,8 @@
 //! All add_column combinations for pgsql
 #![allow(unused_imports)]
 
-use crate::backend::{MsSql, SqlGenerator};
-use crate::types;
+use barrel::backend::{MsSql, SqlGenerator};
+use barrel::types;
 
 #[test]
 fn text() {

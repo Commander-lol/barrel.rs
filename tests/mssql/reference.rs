@@ -1,7 +1,7 @@
 #![allow(unused_imports)]
 
-use crate::backend::{MsSql, SqlGenerator};
-use crate::{types, Migration, Table};
+use barrel::backend::{MsSql, SqlGenerator};
+use barrel::{types, Migration, Table};
 
 #[test]
 fn in_schema() {

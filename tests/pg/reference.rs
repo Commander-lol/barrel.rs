@@ -1,7 +1,7 @@
 #![allow(unused_imports)]
 
-use crate::backend::{Pg, SqlGenerator};
-use crate::{types, Migration, Table};
+use barrel::backend::{Pg, SqlGenerator};
+use barrel::{types, Migration, Table};
 
 #[test]
 fn in_schema() {

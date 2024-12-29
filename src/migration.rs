@@ -28,6 +28,8 @@ pub struct Migration {
     pub schema: Option<String>,
     #[doc(hidden)]
     pub changes: Vec<DatabaseChange>,
+    #[doc(hidden)]
+    pub down: Option<Box<Migration>>,
 }
 
 #[derive(Debug, Clone)]
@@ -65,6 +67,7 @@ impl Migration {
         Migration {
             schema: None,
             changes: Vec::new(),
+            down: None,
         }
     }
 
@@ -73,6 +76,15 @@ impl Migration {
         Self {
             schema: Some(schema.into()),
             ..self
+        }
+    }
+    
+    pub fn down(self, configure: impl FnOnce(&mut Migration)) -> Migration {
+        let mut down = Migration::new();
+        configure(&mut down);
+        Self {
+            down: Some(Box::new(down)),
+           ..self
         }
     }
 
@@ -238,6 +250,10 @@ impl Migration {
     /// possible to infer (e.g. revert a `drop_table`)
     pub fn revert<T: SqlGenerator>(&self) -> Result<String, MigrationRevertError> {
         use DatabaseChange::*;
+        
+        if let Some(ref down) = self.down {
+            return Ok(down.make::<T>());
+        }
 
         let mut sql = String::new();
         let schema = self.schema.as_ref().map(|s| s.as_str());
