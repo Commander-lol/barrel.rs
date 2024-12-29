@@ -1,4 +1,4 @@
-use crate::types;
+use barrel::types;
 
 #[test]
 fn cloning_types() {

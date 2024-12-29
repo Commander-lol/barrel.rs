@@ -5,8 +5,8 @@ mod utils;
 #[cfg(all(feature = "sqlite3", feature = "pg", feature = "mysql"))]
 mod runtime;
 
-use crate::types::{BaseType, Type, WrappedDefault};
-use crate::Migration;
+use barrel::types::{BaseType, Type, WrappedDefault};
+use barrel::Migration;
 
 #[test]
 fn create_multiple_tables() {
@@ -99,11 +99,6 @@ fn default_render_uuid() {
     );
 }
 
-// #[test]
-// fn default_render_date() {
-//     use self::WrappedDefault::*;
-//     assert_eq!(format!("{}", Date(SystemTime::now())), "".to_owned());
-// }
 
 #[test]
 fn default_render_binary() {
@@ -118,12 +113,3 @@ fn default_render_binary() {
         "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]".to_owned()
     );
 }
-
-// #[test]
-// fn default_render_array() {
-//     use self::WrappedDefault::*;
-//     assert_eq!(
-//         format!("{}", Array(vec![Type::new(BaseType::Custom("GAY"))])),
-//         "".to_owned()
-//     );
-// }

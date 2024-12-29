@@ -2,7 +2,7 @@
 
 #![allow(unused_imports)]
 
-use crate::backend::{MySql, SqlGenerator};
+use barrel::backend::{MySql, SqlGenerator};
 
 #[test]
 fn create_table() {

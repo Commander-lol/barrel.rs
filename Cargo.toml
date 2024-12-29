@@ -1,6 +1,6 @@
 [package]
 name = "barrel"
-version = "0.6.6-alpha.0"
+version = "0.8.0-indev.1"
 
 description = "A powerful schema migration building API for Rust"
 authors = ["Katharina Fey <kookie@spacekookie.de>", "Rob Rowe <rippinrobr@gmail.com>"]
@@ -31,7 +31,6 @@ required-features = ["sqlite3"]
 
 [features]
 default = []
-diesel = ["tempfile", "diesel_rs"]
 sqlite3 = []
 mysql = []
 mssql = []
@@ -41,7 +40,4 @@ pg = []
 #   even for stable version upgrades
 unstable = []
 
-
 [dependencies]
-tempfile = { version = "3", optional = true }
-diesel_rs = { version = ">= 1.2, < 2.0", package = "diesel", default_features = false, optional = true }

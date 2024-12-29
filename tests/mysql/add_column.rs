@@ -1,8 +1,8 @@
 //! All add_column combinations for mysql
 #![allow(unused_imports)]
 
-use crate::backend::{MySql, SqlGenerator};
-use crate::types;
+use barrel::backend::{MySql, SqlGenerator};
+use barrel::types;
 
 #[test]
 fn text() {

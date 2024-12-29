@@ -97,25 +97,15 @@
 //! If you find database-specific features or documentation lacking,
 //! don't hesitate to open an issue/PR about it.
 
-#[cfg(feature = "diesel")]
-pub mod integrations;
-#[cfg(feature = "diesel")]
-pub use integrations::*;
-
 pub mod backend;
 pub mod connectors;
 pub mod functions;
 pub mod migration;
 pub mod table;
 pub mod types;
-
 pub use backend::SqlVariant;
 pub use migration::Migration;
 pub use table::{Table, TableMeta};
-
-#[cfg(test)]
-mod tests;
-
 use std::rc::Rc;
 
 /// An enum set that represents a single change on a table
@@ -209,4 +199,18 @@ pub enum ForeignKeyChange {
 pub enum PrimaryKeyChange {
     /// Adds a primary key to the table
     AddPrimaryKey(Vec<String>),
+}
+
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub enum UnsupportedReverseChange {
+    /// Temporary value, representing a ChangeTable command
+    #[doc(hidden)]
+    TempDontRelyOnThis_ChangeTable,
+    /// Can't reverse a drop table command as there isn't sufficient metadata to restore the table
+    DropTable(String),
+    /// Can't reverse a drop table command as there isn't sufficient metadata to restore the table
+    DropTableIfExists(String),
+    /// Can't automatically reverse a custom string, as there is no metadata defining the change
+    CustomLine(String),
 }

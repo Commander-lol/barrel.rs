@@ -1,7 +1,7 @@
 //! Other simple table/ column migrations
 #![allow(unused_imports)]
 
-use crate::backend::{Pg, SqlGenerator};
+use barrel::backend::{Pg, SqlGenerator};
 
 #[test]
 fn create_table() {
@@ -64,7 +64,7 @@ fn drop_column() {
 fn rename_column() {
     let sql = Pg::rename_column("old_column", "new_column");
     assert_eq!(
-        String::from("ALTER COLUMN \"old_column\" RENAME TO \"new_column\""),
+        String::from("RENAME COLUMN \"old_column\" TO \"new_column\""),
         sql
     );
 }

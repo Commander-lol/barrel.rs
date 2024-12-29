@@ -1,7 +1,7 @@
 //! Other simple table/ column migrations
 #![allow(unused_imports)]
 
-use crate::backend::{MsSql, SqlGenerator};
+use barrel::backend::{MsSql, SqlGenerator};
 
 #[test]
 fn create_table() {

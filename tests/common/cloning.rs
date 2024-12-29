@@ -1,4 +1,4 @@
-use crate::{
+use barrel::{
     types::{self, Type},
     Migration,
 };

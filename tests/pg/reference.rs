@@ -1,11 +1,11 @@
 #![allow(unused_imports)]
 
-use crate::backend::{MsSql, SqlGenerator};
-use crate::{types, Migration, Table};
+use barrel::backend::{Pg, SqlGenerator};
+use barrel::{types, Migration, Table};
 
 #[test]
 fn in_schema() {
-    let sql = MsSql::add_column(
+    let sql = Pg::add_column(
         false,
         Some("schema"),
         "author",
@@ -14,13 +14,13 @@ fn in_schema() {
 
     assert_eq!(
         sql,
-        "[author] INT REFERENCES [schema].[users]([id]) NOT NULL"
+        "\"author\" INTEGER REFERENCES \"schema\".\"users\"(id) NOT NULL"
     );
 }
 
 #[test]
 fn ext_schema() {
-    let sql = MsSql::add_column(
+    let sql = Pg::add_column(
         false,
         Some("schema"),
         "author",
@@ -29,6 +29,6 @@ fn ext_schema() {
 
     assert_eq!(
         sql,
-        "[author] INT REFERENCES [other_schema].[users]([id]) NOT NULL"
+        "\"author\" INTEGER REFERENCES \"other_schema\".\"users\"(id) NOT NULL"
     );
 }
