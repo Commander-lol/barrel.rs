@@ -31,7 +31,6 @@ required-features = ["sqlite3"]
 
 [features]
 default = []
-diesel = ["tempfile", "diesel_rs"]
 sqlite3 = []
 mysql = []
 mssql = []
@@ -41,7 +40,4 @@ pg = []
 #   even for stable version upgrades
 unstable = []
 
-
 [dependencies]
-tempfile = { version = "3", optional = true }
-diesel_rs = { version = ">= 1.2, < 2.0", package = "diesel", default_features = false, optional = true }

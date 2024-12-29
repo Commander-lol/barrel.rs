@@ -97,11 +97,6 @@
 //! If you find database-specific features or documentation lacking,
 //! don't hesitate to open an issue/PR about it.
 
-#[cfg(feature = "diesel")]
-pub mod integrations;
-#[cfg(feature = "diesel")]
-pub use integrations::*;
-
 pub mod backend;
 pub mod connectors;
 pub mod functions;
