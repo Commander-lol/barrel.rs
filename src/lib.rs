@@ -103,14 +103,9 @@ pub mod functions;
 pub mod migration;
 pub mod table;
 pub mod types;
-
 pub use backend::SqlVariant;
 pub use migration::Migration;
 pub use table::{Table, TableMeta};
-
-#[cfg(test)]
-mod tests;
-
 use std::rc::Rc;
 
 /// An enum set that represents a single change on a table

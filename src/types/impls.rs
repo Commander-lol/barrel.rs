@@ -114,7 +114,7 @@ pub struct Type {
 /// This is a public API, be considered about breaking thigns
 #[cfg_attr(rustfmt, rustfmt_skip)]
 impl Type {
-    pub(crate) fn new(inner: BaseType) -> Self {
+    pub fn new(inner: BaseType) -> Self {
         Self {
             nullable: false,
             unique: false,
